@@ -137,6 +137,10 @@ public class App extends JPanel implements KeyListener {
             this.randomUpdateState = true;
             generate_initial_board();
             repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_S) {
+            // Step through one generation if the S key is pressed.
+            permutate();
+            repaint();
         }
     }
 

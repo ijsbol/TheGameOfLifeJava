@@ -5,6 +5,7 @@
  - Press the `space key` to start the simulation.
  - Press the `tab key` to pause the simulation.
  - Press the `R` key to randomly replace all of the cells with alive/dead ones.
+ - Press the `S` key to step through one generation. 
  - Click to change the alive/dead state of a cell.
  - Drag to change the alive/dead state of many cells to the inverse of the state of the first cell you clicked.
  
