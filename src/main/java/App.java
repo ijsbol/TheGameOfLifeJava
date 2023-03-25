@@ -28,8 +28,6 @@ public class App extends JPanel {
     private static final int WINDOW_HEIGHT_IN_CELLS = 800;
 
     // Extra information
-    private static final boolean OUTLINE_CELLS = false;
-    private static final int OUTLINE_SIZE_IN_PIXELS = 1;
     private static final int MAX_FRAME_RATE = 60;
     private static final boolean RANDOM_START = true;
 
