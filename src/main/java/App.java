@@ -32,7 +32,6 @@ public class App extends JPanel implements KeyListener {
 
     // Extra information
     private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
-    private static final boolean RANDOM_START = false;
 
     /* :: Window adjustments ::
      * For some reason JFrame includes the window bounding box as part
@@ -47,7 +46,7 @@ public class App extends JPanel implements KeyListener {
     private boolean currentlyUpdatingCells = false;
     private boolean[][] board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
     private List<Integer> updated_cell_locations = new ArrayList<>();
-
+    private boolean randomUpdateState = false;
     private boolean initalCellMouseClickedAliveState;
 
     public App() {
@@ -133,6 +132,11 @@ public class App extends JPanel implements KeyListener {
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_TAB) {
             // Pause cell permutations if tab key pressed.
             this.currentlyUpdatingCells = false;
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_R) {
+            // Randomly replace all cells if the R key is pressed.
+            this.randomUpdateState = true;
+            generate_initial_board();
+            repaint();
         }
     }
 
@@ -146,14 +150,20 @@ public class App extends JPanel implements KeyListener {
         Random random = new Random();
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
-                if (RANDOM_START) {
+                if (this.randomUpdateState) {
                     // If it's a random start, pick a random live/dead state.
                     this.board[y][x] = choices.get(random.nextInt(choices.size()));
+
+                    // Add the new cell to the frame buffer.
+                    updated_cell_locations.add(x);
+                    updated_cell_locations.add(y);
                 } else {
                     this.board[y][x] = false;
                 }
             }
         }
+
+        randomUpdateState = false;
     }
 
     private int getLiveSurroudningCells(int x, int y) {
