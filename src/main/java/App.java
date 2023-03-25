@@ -1,8 +1,5 @@
-import java.awt.Canvas;
 import java.awt.Graphics;
 import javax.swing.Timer;
-
-import javafx.scene.control.Cell;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,7 +8,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import java.util.Random;
-import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,16 +15,16 @@ import java.util.Arrays;
 public class App extends JPanel {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 1;
+    private static final int CELL_SIZE_IN_PIXELS = 2;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 800;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 800;
+    private static final int WINDOW_WIDTH_IN_CELLS = 300;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 300;
 
     // Extra information
-    private static final int MAX_FRAME_RATE = 60;
+    private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
     private static final boolean RANDOM_START = true;
 
     /* :: Window adjustments ::
@@ -120,7 +116,6 @@ public class App extends JPanel {
     }
 
     private void permutate() {
-        // boolean[][] temp_board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
         this.updated_cell_locations = new ArrayList<>();
 
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
@@ -165,7 +160,7 @@ public class App extends JPanel {
     }
 
     private void createRepaintTimer(JFrame frame) {
-        final Timer timer = new Timer(10, null);
+        final Timer timer = new Timer(MILLIESECONDS_BETWEEN_FRAMES, null);
 
         timer.addActionListener(e -> {
             if (!frame.isVisible()) {
