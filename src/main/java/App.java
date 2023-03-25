@@ -3,6 +3,8 @@ import javax.swing.Timer;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,16 +14,16 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class App extends JPanel {
+public class App extends JPanel implements KeyListener {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 2;
+    private static final int CELL_SIZE_IN_PIXELS = 10;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 300;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 300;
+    private static final int WINDOW_WIDTH_IN_CELLS = 50;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 50;
 
     // Extra information
     private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
@@ -36,9 +38,17 @@ public class App extends JPanel {
     private static final int WINDOW_WIDTH_ADJUSTMENT = 6;
     private static final int WINDOW_HEIGHT_ADJUSTMENT = 28;
 
+    // Don't mess with these :}
+    private boolean currentlyUpdatingCells = false;
     private boolean[][] board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
-
     private List<Integer> updated_cell_locations;
+
+    public App() {
+        // Initilize the key listeners.
+        addKeyListener(this);
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Game of Life");
@@ -68,13 +78,28 @@ public class App extends JPanel {
 
     }
 
+    public void keyPressed(KeyEvent keyEvent) {
+        if(keyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
+            // Continue cell permutations if space key pressed.
+            this.currentlyUpdatingCells = true;
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_TAB) {
+            // Pause cell permutations if tab key pressed.
+            this.currentlyUpdatingCells = false;
+        }
+    }
+
+    public void keyReleased(KeyEvent keyEvent) { }
+    public void keyTyped(KeyEvent e) { }
+
     private void generate_initial_board() {
+        // Generate the initial board.
         Boolean[] array = {true, false};
         List<Boolean> choices = Arrays.asList(array);
         Random random = new Random();
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
                 if (RANDOM_START) {
+                    // If it's a random start, pick a random live/dead state.
                     this.board[y][x] = choices.get(random.nextInt(choices.size()));
                 } else {
                     this.board[y][x] = false;
@@ -84,6 +109,7 @@ public class App extends JPanel {
     }
 
     private int getLiveSurroudningCells(int x, int y) {
+        // Count all live surrounding cells.
         Integer[] offsets = {-1, 0, 1};
 
         int liveSurroudningCells = 0;
@@ -116,6 +142,7 @@ public class App extends JPanel {
     }
 
     private void permutate() {
+        // Permutate the board by one generation.
         this.updated_cell_locations = new ArrayList<>();
 
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
@@ -160,15 +187,18 @@ public class App extends JPanel {
     }
 
     private void createRepaintTimer(JFrame frame) {
+        // Basic repaint timer.
         final Timer timer = new Timer(MILLIESECONDS_BETWEEN_FRAMES, null);
 
         timer.addActionListener(e -> {
             if (!frame.isVisible()) {
                 timer.stop();
             } else {
-                this.permutate();
-                frame.repaint();
-                frame.pack();
+                if (currentlyUpdatingCells) {
+                    this.permutate();
+                    frame.repaint();
+                    frame.pack();
+                }
             }
         });
 
@@ -176,6 +206,7 @@ public class App extends JPanel {
     }
 
     private void initial_paint(Graphics graphicsContext) {
+        // The intial board paint (paints all cells at once)
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
                 if (board[y][x]) {
@@ -194,6 +225,7 @@ public class App extends JPanel {
     }
 
     private void partial_frame_update_paint(Graphics graphicsContext) {
+        // Paints only the updated cells.
         for (int index = 0; index < this.updated_cell_locations.size(); index += 2) {
             int x = this.updated_cell_locations.get(index);
             int y = this.updated_cell_locations.get(index + 1);
@@ -214,6 +246,7 @@ public class App extends JPanel {
     }
 
     public void paintComponent(Graphics graphicsContext) {
+        // Called every update frame.
         if (updated_cell_locations == null) {
             this.initial_paint(graphicsContext);
         } else {
