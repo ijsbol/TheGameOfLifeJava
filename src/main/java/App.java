@@ -11,19 +11,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import java.util.Random;
+import java.util.Map.Entry;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class App extends JPanel {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 2;
+    private static final int CELL_SIZE_IN_PIXELS = 1;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 200;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 200;
+    private static final int WINDOW_WIDTH_IN_CELLS = 800;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 800;
 
     // Extra information
     private static final boolean OUTLINE_CELLS = false;
@@ -41,6 +43,8 @@ public class App extends JPanel {
     private static final int WINDOW_HEIGHT_ADJUSTMENT = 28;
 
     private boolean[][] board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
+
+    private List<Integer> updated_cell_locations;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Game of Life");
@@ -83,13 +87,6 @@ public class App extends JPanel {
                 }
             }
         }
-
-        // Manually creating a glyder for now.
-        // this.board[0][1] = true;
-        // this.board[1][2] = true;
-        // this.board[2][0] = true;
-        // this.board[2][1] = true;
-        // this.board[2][2] = true;
     }
 
     private int getLiveSurroudningCells(int x, int y) {
@@ -114,8 +111,6 @@ public class App extends JPanel {
                         cell_y += WINDOW_HEIGHT_IN_CELLS;
                     }
 
-                    // System.out.println("delta_x: " + delta_x + ", delta_y: " + delta_y + ", cell_x: " + cell_x + ", cell_y: " + cell_y + ", alive: " + this.board[cell_y][cell_x]);
-
                     if (this.board[cell_y][cell_x]) {
                         liveSurroudningCells += 1;
                     }
@@ -123,12 +118,12 @@ public class App extends JPanel {
             }
         }
 
-        // System.out.println("liveSurroudningCells: " + liveSurroudningCells);
         return liveSurroudningCells;
     }
 
     private void permutate() {
-        boolean[][] temp_board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
+        // boolean[][] temp_board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
+        this.updated_cell_locations = new ArrayList<>();
 
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
@@ -138,24 +133,37 @@ public class App extends JPanel {
                     // Current cell is live.
                     if (liveSurroundingCellCount < 2) {
                         // A live cell dies if it has fewer than two live neighbors.
+                        this.updated_cell_locations.add(x);
+                        this.updated_cell_locations.add(y);
                     } else if (liveSurroundingCellCount == 2 || liveSurroundingCellCount == 3) {
                         // A live cell with two or three live neighbors lives on to the next generation.
-                        temp_board[y][x] = true;
+
                     } else if (liveSurroundingCellCount > 3) {
                         // A live cell with more than three live neighbors dies.
+                        this.updated_cell_locations.add(x);
+                        this.updated_cell_locations.add(y);
                     }
                 } else {
                     // Current cell is dead
                     if (liveSurroundingCellCount == 3) {
                         // A dead cell will be brought back to live if it has exactly three live neighbors.
-                        temp_board[y][x] = true;
+                        this.updated_cell_locations.add(x);
+                        this.updated_cell_locations.add(y);
                     }
                 }
                 
             }
         }
 
-        this.board = temp_board;
+        for (int index = 0; index < this.updated_cell_locations.size(); index+=2) {
+            int x = this.updated_cell_locations.get(index);
+            int y = this.updated_cell_locations.get(index + 1);
+            if (this.board[y][x]) {
+                this.board[y][x] = false;
+            } else {
+                this.board[y][x] = true;
+            }
+        }
     }
 
     private void createRepaintTimer(JFrame frame) {
@@ -174,7 +182,7 @@ public class App extends JPanel {
         timer.start();
     }
 
-    public void paintComponent(Graphics graphicsContext) {
+    private void initial_paint(Graphics graphicsContext) {
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
                 if (board[y][x]) {
@@ -189,6 +197,34 @@ public class App extends JPanel {
                     CELL_SIZE_IN_PIXELS
                 );
             }
+        }
+    }
+
+    private void partial_frame_update_paint(Graphics graphicsContext) {
+        for (int index = 0; index < this.updated_cell_locations.size(); index += 2) {
+            int x = this.updated_cell_locations.get(index);
+            int y = this.updated_cell_locations.get(index + 1);
+
+            if (board[y][x]) {
+                graphicsContext.setColor(ALIVE_CELL_COLOUR);
+            } else {
+                graphicsContext.setColor(DEAD_CELL_COLOUR);
+            }
+
+            graphicsContext.fillRect(
+                (x * CELL_SIZE_IN_PIXELS),
+                (y * CELL_SIZE_IN_PIXELS),
+                CELL_SIZE_IN_PIXELS,
+                CELL_SIZE_IN_PIXELS
+            );
+        }
+    }
+
+    public void paintComponent(Graphics graphicsContext) {
+        if (updated_cell_locations == null) {
+            this.initial_paint(graphicsContext);
+        } else {
+            this.partial_frame_update_paint(graphicsContext);
         }
 
     }
