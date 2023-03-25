@@ -17,19 +17,19 @@ import java.util.Arrays;
 public class App extends JPanel {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 10;
+    private static final int CELL_SIZE_IN_PIXELS = 2;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 10;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 10;
+    private static final int WINDOW_WIDTH_IN_CELLS = 200;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 200;
 
     // Extra information
     private static final boolean OUTLINE_CELLS = false;
     private static final int OUTLINE_SIZE_IN_PIXELS = 1;
     private static final int MAX_FRAME_RATE = 60;
-    private static final boolean RANDOM_START = false;
+    private static final boolean RANDOM_START = true;
 
     /* :: Window adjustments ::
      * For some reason JFrame includes the window bounding box as part
@@ -41,8 +41,6 @@ public class App extends JPanel {
     private static final int WINDOW_HEIGHT_ADJUSTMENT = 28;
 
     private boolean[][] board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
-    private boolean[][] temp_board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
-
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Game of Life");
@@ -87,19 +85,11 @@ public class App extends JPanel {
         }
 
         // Manually creating a glyder for now.
-        this.board[0][1] = true;
-        this.board[1][2] = true;
-        this.board[2][0] = true;
-        this.board[2][1] = true;
-        this.board[2][2] = true;
-    }
-
-    private void clean_temp_board() {
-        for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
-            for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
-                this.temp_board[y][x] = false;
-            }
-        }
+        // this.board[0][1] = true;
+        // this.board[1][2] = true;
+        // this.board[2][0] = true;
+        // this.board[2][1] = true;
+        // this.board[2][2] = true;
     }
 
     private int getLiveSurroudningCells(int x, int y) {
@@ -124,7 +114,7 @@ public class App extends JPanel {
                         cell_y += WINDOW_HEIGHT_IN_CELLS;
                     }
 
-                    System.out.println("delta_x: " + delta_x + ", delta_y: " + delta_y + ", cell_x: " + cell_x + ", cell_y: " + cell_y + ", alive: " + this.board[cell_y][cell_x]);
+                    // System.out.println("delta_x: " + delta_x + ", delta_y: " + delta_y + ", cell_x: " + cell_x + ", cell_y: " + cell_y + ", alive: " + this.board[cell_y][cell_x]);
 
                     if (this.board[cell_y][cell_x]) {
                         liveSurroudningCells += 1;
@@ -133,12 +123,13 @@ public class App extends JPanel {
             }
         }
 
-        System.out.println("liveSurroudningCells: " + liveSurroudningCells);
+        // System.out.println("liveSurroudningCells: " + liveSurroudningCells);
         return liveSurroudningCells;
     }
 
     private void permutate() {
-        this.clean_temp_board();
+        boolean[][] temp_board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
+
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
                 int liveSurroundingCellCount = this.getLiveSurroudningCells(x, y);
@@ -149,7 +140,7 @@ public class App extends JPanel {
                         // A live cell dies if it has fewer than two live neighbors.
                     } else if (liveSurroundingCellCount == 2 || liveSurroundingCellCount == 3) {
                         // A live cell with two or three live neighbors lives on to the next generation.
-                        this.temp_board[y][x] = true;
+                        temp_board[y][x] = true;
                     } else if (liveSurroundingCellCount > 3) {
                         // A live cell with more than three live neighbors dies.
                     }
@@ -157,18 +148,18 @@ public class App extends JPanel {
                     // Current cell is dead
                     if (liveSurroundingCellCount == 3) {
                         // A dead cell will be brought back to live if it has exactly three live neighbors.
-                        this.temp_board[y][x] = true;
+                        temp_board[y][x] = true;
                     }
                 }
                 
             }
         }
 
-        this.board = this.temp_board;
+        this.board = temp_board;
     }
 
     private void createRepaintTimer(JFrame frame) {
-        final Timer timer = new Timer(5000, null);
+        final Timer timer = new Timer(10, null);
 
         timer.addActionListener(e -> {
             if (!frame.isVisible()) {
