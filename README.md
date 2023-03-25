@@ -2,12 +2,16 @@
  The Game of Life but programmed in Java
 
 ## Controls
- - Press the `space key` to start the simulation.
- - Press the `tab key` to pause the simulation.
- - Press the `R` key to randomly replace all of the cells with alive/dead ones.
- - Press the `S` key to step through one generation. 
  - Click to change the alive/dead state of a cell.
  - Drag to change the alive/dead state of many cells to the inverse of the state of the first cell you clicked.
+ 
+## Key binds
+|Key|Action|
+|--|--|
+|`SPACE BAR`|Start the simulation.|
+|`TAB KEY`|Pause the simulation.|
+|`R KEY`|Randomly replace all of the cells with alive/dead ones.|
+|`S KEY`|Step through one generation.| 
  
 ## Demo
 ![img](https://i.imgur.com/TXJWuP1.gif)
