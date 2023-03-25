@@ -1,10 +1,15 @@
 import java.awt.Graphics;
+import java.awt.Point;
+
 import javax.swing.Timer;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -27,7 +32,7 @@ public class App extends JPanel implements KeyListener {
 
     // Extra information
     private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
-    private static final boolean RANDOM_START = true;
+    private static final boolean RANDOM_START = false;
 
     /* :: Window adjustments ::
      * For some reason JFrame includes the window bounding box as part
@@ -41,13 +46,55 @@ public class App extends JPanel implements KeyListener {
     // Don't mess with these :}
     private boolean currentlyUpdatingCells = false;
     private boolean[][] board = new boolean[WINDOW_WIDTH_IN_CELLS][WINDOW_HEIGHT_IN_CELLS];
-    private List<Integer> updated_cell_locations;
+    private List<Integer> updated_cell_locations = new ArrayList<>();
+
+    private boolean initalCellMouseClickedAliveState;
 
     public App() {
         // Initilize the key listeners.
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                Point mousePoint = mouseEvent.getPoint();
+
+                int cell_pos_x = mousePoint.x / CELL_SIZE_IN_PIXELS;
+                int cell_pos_y = mousePoint.y / CELL_SIZE_IN_PIXELS;
+
+                initalCellMouseClickedAliveState = board[cell_pos_y][cell_pos_x];
+
+                // Invert the cell type.
+                board[cell_pos_y][cell_pos_x] = !initalCellMouseClickedAliveState;
+                
+                // Add the new cell to the repaint frame update.
+                updated_cell_locations.add(cell_pos_x);
+                updated_cell_locations.add(cell_pos_y);
+                
+                // Repaint the frame.
+                repaint();
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+                Point mousePoint = mouseEvent.getPoint(); 
+                int cell_pos_x = mousePoint.x / CELL_SIZE_IN_PIXELS;
+                int cell_pos_y = mousePoint.y / CELL_SIZE_IN_PIXELS;
+
+                // Set the cell alive state to the inverse of the first cell type clicked.
+                board[cell_pos_y][cell_pos_x] = !initalCellMouseClickedAliveState;
+                
+                // Add the new cell to the repaint frame update.
+                updated_cell_locations.add(cell_pos_x);
+                updated_cell_locations.add(cell_pos_y);
+                
+                // Repaint the frame.
+                repaint();
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -68,6 +115,7 @@ public class App extends JPanel implements KeyListener {
         App canvas = new App();
 
         canvas.setSize(screenWidth, screenHeight);
+        canvas.setBackground(DEAD_CELL_COLOUR);
 
         canvas.generate_initial_board();
         frame.add(canvas);
@@ -190,6 +238,10 @@ public class App extends JPanel implements KeyListener {
         // Basic repaint timer.
         final Timer timer = new Timer(MILLIESECONDS_BETWEEN_FRAMES, null);
 
+        frame.repaint();
+        frame.setBackground(DEAD_CELL_COLOUR);
+        frame.pack();
+
         timer.addActionListener(e -> {
             if (!frame.isVisible()) {
                 timer.stop();
@@ -197,6 +249,7 @@ public class App extends JPanel implements KeyListener {
                 if (currentlyUpdatingCells) {
                     this.permutate();
                     frame.repaint();
+                    frame.setBackground(DEAD_CELL_COLOUR);
                     frame.pack();
                 }
             }
