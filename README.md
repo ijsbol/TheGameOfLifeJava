@@ -7,3 +7,6 @@
  - Press the `R` key to randomly replace all of the cells with alive/dead ones.
  - Click to change the alive/dead state of a cell.
  - Drag to change the alive/dead state of many cells to the inverse of the state of the first cell you clicked.
+ 
+ ## Demo
+ ![img](https://i.imgur.com/TXJWuP1.gif)
