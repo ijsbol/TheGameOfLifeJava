@@ -15,3 +15,10 @@
  
 ## Demo
 ![img](https://i.imgur.com/TXJWuP1.gif)
+
+## All the GameOfLifes I've made.
+|Language|Repo link|
+|--|--|
+|Python|https://github.com/Scrumpyy/TheGameOfLifePython|
+|Java|https://github.com/Scrumpyy/TheGameOfLifeJava|
+|Javascript|https://github.com/Scrumpyy/TheGameOfLifeJavascript|
