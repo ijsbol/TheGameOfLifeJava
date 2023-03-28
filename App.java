@@ -16,8 +16,10 @@ import javax.swing.JPanel;
 
 import java.util.Random;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 
 public class App extends JPanel implements KeyListener {
 
@@ -48,6 +50,13 @@ public class App extends JPanel implements KeyListener {
     private List<Integer> updated_cell_locations = new ArrayList<>();
     private boolean randomUpdateState = false;
     private boolean initalCellMouseClickedAliveState;
+    private boolean rainbowMode = false;
+
+    // Rainbow mode variables
+    private Map<String, Integer> topLeft = Map.of("r", 0,  "g", 0,  "b", 0);
+    private Map<String, Integer> topRight = Map.of("r", 255,  "g", 0,  "b", 0);
+    private Map<String, Integer> bottomLeft = Map.of("r", 0,  "g", 255,  "b", 0);
+    private Map<String, Integer> bottomRight = Map.of("r", 0,  "g", 0,  "b", 255);
 
     public App() {
         // Initilize the key listeners.
@@ -144,6 +153,14 @@ public class App extends JPanel implements KeyListener {
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_C) {
             // Clears the board.
             generate_initial_board();
+            repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_Q) {
+            // Enables rainbow mode.
+            this.rainbowMode = true;
+            repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_W) {
+            // Disabled rainbow mode.
+            this.rainbowMode = false;
             repaint();
         }
     }
@@ -260,12 +277,32 @@ public class App extends JPanel implements KeyListener {
         timer.start();
     }
 
+    private Color convertXYToRGB(int x, int y) {
+        double div = 1.0 / (WINDOW_WIDTH_IN_CELLS * WINDOW_HEIGHT_IN_CELLS);
+    
+        int r = (int) (div * (bottomLeft.get("r")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("r")* x * y 
+                        + topLeft.get("r")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("r")* x * y));
+        
+        int g = (int) (div * (bottomLeft.get("g")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("g")* x * y 
+                        + topLeft.get("g")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("g")* x * y));
+                        
+        int b = (int) (div * (bottomLeft.get("b")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("b")* x * y 
+                        + topLeft.get("b")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("b")* x * y));
+
+        return new Color(r, g, b);
+    }
+
     private void initial_paint(Graphics graphicsContext) {
         // The intial board paint (paints all cells at once)
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
                 if (board[y][x]) {
-                    graphicsContext.setColor(ALIVE_CELL_COLOUR);
+                    if (rainbowMode) {
+                        Color color = convertXYToRGB(x, y);
+                        graphicsContext.setColor(color);
+                    } else {
+                        graphicsContext.setColor(ALIVE_CELL_COLOUR);
+                    }
                 } else {
                     graphicsContext.setColor(DEAD_CELL_COLOUR);
                 }
@@ -286,7 +323,12 @@ public class App extends JPanel implements KeyListener {
             int y = this.updated_cell_locations.get(index + 1);
 
             if (board[y][x]) {
-                graphicsContext.setColor(ALIVE_CELL_COLOUR);
+                if (rainbowMode) {
+                    Color color = convertXYToRGB(x, y);
+                    graphicsContext.setColor(color);
+                } else {
+                    graphicsContext.setColor(ALIVE_CELL_COLOUR);
+                }
             } else {
                 graphicsContext.setColor(DEAD_CELL_COLOUR);
             }
