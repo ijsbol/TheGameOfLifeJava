@@ -11,7 +11,9 @@
 |`SPACE BAR`|Start the simulation.|
 |`TAB KEY`|Pause the simulation.|
 |`R KEY`|Randomly replace all of the cells with alive/dead ones.|
-|`S KEY`|Step through one generation.| 
+|`S KEY`|Step through one generation.|
+|`Q KEY`|Enable rainbow mode.|
+|`W KEY`|Disable rainbow mode.|
  
 ## Demo
 ![img](https://i.imgur.com/TXJWuP1.gif)
