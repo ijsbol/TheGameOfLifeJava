@@ -22,13 +22,13 @@ import java.util.Arrays;
 public class App extends JPanel implements KeyListener {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 10;
+    private static final int CELL_SIZE_IN_PIXELS = 3;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 50;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 50;
+    private static final int WINDOW_WIDTH_IN_CELLS = 200;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 200;
 
     // Extra information
     private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
@@ -141,6 +141,10 @@ public class App extends JPanel implements KeyListener {
             // Step through one generation if the S key is pressed.
             permutate();
             repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_C) {
+            // Clears the board.
+            generate_initial_board();
+            repaint();
         }
     }
 
@@ -170,37 +174,21 @@ public class App extends JPanel implements KeyListener {
         randomUpdateState = false;
     }
 
-    private int getLiveSurroudningCells(int x, int y) {
-        // Count all live surrounding cells.
-        Integer[] offsets = {-1, 0, 1};
+    private int getLiveSurroundingCells(int x, int y) {
 
-        int liveSurroudningCells = 0;
+        int y1 = (y+1) % WINDOW_HEIGHT_IN_CELLS;
+        int x1 = ((x-1) + WINDOW_WIDTH_IN_CELLS) % WINDOW_WIDTH_IN_CELLS;
 
-        for (int delta_y: offsets) {
-            for (int delta_x: offsets) {
-                if (delta_x == 0 && delta_y == 0) {}
-                else {
-                    int cell_x = x + delta_x;
-                    int cell_y = y + delta_y;
-                    
-                    if (cell_x >= WINDOW_WIDTH_IN_CELLS) {
-                        cell_x -= WINDOW_WIDTH_IN_CELLS;
-                    } else if (cell_x < 0) {
-                        cell_x += WINDOW_WIDTH_IN_CELLS;
-                    } if (cell_y >= WINDOW_HEIGHT_IN_CELLS) {
-                        cell_y -= WINDOW_HEIGHT_IN_CELLS;
-                    } else if (cell_y < 0) {
-                        cell_y += WINDOW_HEIGHT_IN_CELLS;
-                    }
+        int y2 = ((y-1) + WINDOW_HEIGHT_IN_CELLS) % WINDOW_HEIGHT_IN_CELLS;
+        int x2 = (x+1) % WINDOW_WIDTH_IN_CELLS;
 
-                    if (this.board[cell_y][cell_x]) {
-                        liveSurroudningCells += 1;
-                    }
-                }
-            }
-        }
+        int numberOfLiveSurroundingCells = (
+            (this.board[y1][x1] ?1:0) + (this.board[y1][x] ?1:0) + (this.board[y1][x2] ?1:0) + 
+            (this.board[y ][x1] ?1:0) +                            (this.board[y ][x2] ?1:0) +
+            (this.board[y2][x1] ?1:0) + (this.board[y2][x] ?1:0) + (this.board[y2][x2] ?1:0)
+        );
 
-        return liveSurroudningCells;
+        return numberOfLiveSurroundingCells;
     }
 
     private void permutate() {
@@ -209,7 +197,7 @@ public class App extends JPanel implements KeyListener {
 
         for (int y = 0; y < WINDOW_HEIGHT_IN_CELLS; y++) {
             for (int x = 0; x < WINDOW_WIDTH_IN_CELLS; x++) {
-                int liveSurroundingCellCount = this.getLiveSurroudningCells(x, y);
+                int liveSurroundingCellCount = this.getLiveSurroundingCells(x, y);
 
                 if (this.board[y][x]) {
                     // Current cell is live.
