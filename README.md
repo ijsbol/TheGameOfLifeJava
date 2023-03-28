@@ -22,3 +22,4 @@
 |Python|https://github.com/Scrumpyy/TheGameOfLifePython|
 |Java|https://github.com/Scrumpyy/TheGameOfLifeJava|
 |Javascript|https://github.com/Scrumpyy/TheGameOfLifeJavascript|
+|PythonSpeedRefactor|https://github.com/Scrumpyy/TheGameOfLifePythonSpeedRefactor|
