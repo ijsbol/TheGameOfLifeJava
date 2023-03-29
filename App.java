@@ -53,10 +53,10 @@ public class App extends JPanel implements KeyListener {
     private boolean rainbowMode = false;
 
     // Rainbow mode variables
-    private Map<String, Integer> topLeft = Map.of("r", 0,  "g", 0,  "b", 0);
-    private Map<String, Integer> topRight = Map.of("r", 255,  "g", 0,  "b", 0);
-    private Map<String, Integer> bottomLeft = Map.of("r", 0,  "g", 255,  "b", 0);
-    private Map<String, Integer> bottomRight = Map.of("r", 0,  "g", 0,  "b", 255);
+    private Map<String, Integer> cornerOne = Map.of("r", 255,  "g", 0,  "b", 0);
+    private Map<String, Integer> cornerTwo = Map.of("r", 0,  "g", 255,  "b", 0);
+    private Map<String, Integer> cornerThree = Map.of("r", 0,  "g", 0,  "b", 255);
+    private Map<String, Integer> cornerFour = Map.of("r", 0,  "g", 255,  "b", 255);
 
     public App() {
         // Initilize the key listeners.
@@ -76,11 +76,11 @@ public class App extends JPanel implements KeyListener {
 
                 // Invert the cell type.
                 board[cell_pos_y][cell_pos_x] = !initalCellMouseClickedAliveState;
-                
+
                 // Add the new cell to the repaint frame update.
                 updated_cell_locations.add(cell_pos_x);
                 updated_cell_locations.add(cell_pos_y);
-                
+
                 // Repaint the frame.
                 repaint();
             }
@@ -88,17 +88,17 @@ public class App extends JPanel implements KeyListener {
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
-                Point mousePoint = mouseEvent.getPoint(); 
+                Point mousePoint = mouseEvent.getPoint();
                 int cell_pos_x = mousePoint.x / CELL_SIZE_IN_PIXELS;
                 int cell_pos_y = mousePoint.y / CELL_SIZE_IN_PIXELS;
 
                 // Set the cell alive state to the inverse of the first cell type clicked.
                 board[cell_pos_y][cell_pos_x] = !initalCellMouseClickedAliveState;
-                
+
                 // Add the new cell to the repaint frame update.
                 updated_cell_locations.add(cell_pos_x);
                 updated_cell_locations.add(cell_pos_y);
-                
+
                 // Repaint the frame.
                 repaint();
             }
@@ -200,7 +200,7 @@ public class App extends JPanel implements KeyListener {
         int x2 = (x+1) % WINDOW_WIDTH_IN_CELLS;
 
         int numberOfLiveSurroundingCells = (
-            (this.board[y1][x1] ?1:0) + (this.board[y1][x] ?1:0) + (this.board[y1][x2] ?1:0) + 
+            (this.board[y1][x1] ?1:0) + (this.board[y1][x] ?1:0) + (this.board[y1][x2] ?1:0) +
             (this.board[y ][x1] ?1:0) +                            (this.board[y ][x2] ?1:0) +
             (this.board[y2][x1] ?1:0) + (this.board[y2][x] ?1:0) + (this.board[y2][x2] ?1:0)
         );
@@ -238,7 +238,7 @@ public class App extends JPanel implements KeyListener {
                         this.updated_cell_locations.add(y);
                     }
                 }
-                
+
             }
         }
 
@@ -279,15 +279,33 @@ public class App extends JPanel implements KeyListener {
 
     private Color convertXYToRGB(int x, int y) {
         double div = 1.0 / (WINDOW_WIDTH_IN_CELLS * WINDOW_HEIGHT_IN_CELLS);
-    
-        int r = (int) (div * (bottomLeft.get("r")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("r")* x * y 
-                        + topLeft.get("r")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("r")* x * y));
-        
-        int g = (int) (div * (bottomLeft.get("g")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("g")* x * y 
-                        + topLeft.get("g")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("g")* x * y));
-                        
-        int b = (int) (div * (bottomLeft.get("b")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + bottomRight.get("b")* x * y 
-                        + topLeft.get("b")* (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y) + topRight.get("b")* x * y));
+
+        int r = (int) Math.min(255,
+            (div * (
+                cornerOne.get("r") * (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerTwo.get("r") * x * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerThree.get("r") * (WINDOW_WIDTH_IN_CELLS - x) * y
+                + cornerFour.get("r") * x * y
+            ))
+        );
+
+        int g = (int) Math.min(255,
+            (div * (
+                cornerOne.get("g") * (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerTwo.get("g") * x * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerThree.get("g") * (WINDOW_WIDTH_IN_CELLS - x) * y
+                + cornerFour.get("g") * x * y
+            ))
+        );
+
+        int b = (int) Math.min(255,
+            (div * (
+                cornerOne.get("b") * (WINDOW_WIDTH_IN_CELLS - x) * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerTwo.get("b") * x * (WINDOW_HEIGHT_IN_CELLS - y)
+                + cornerThree.get("b") * (WINDOW_WIDTH_IN_CELLS - x) * y
+                + cornerFour.get("b") * x * y
+            ))
+        );
 
         return new Color(r, g, b);
     }
