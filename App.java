@@ -171,6 +171,7 @@ public class App extends JPanel implements KeyListener {
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_Q) {
             // Enables rainbow mode.
             this.rainbowMode = true;
+            this.neighbourDeterministicCellColouringMode = false;
             repaint();
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_W) {
             // Disabled rainbow mode.
@@ -179,6 +180,7 @@ public class App extends JPanel implements KeyListener {
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_O) {
             // Enables neighbour-deterministic cell colouring.
             this.neighbourDeterministicCellColouringMode = true;
+            this.rainbowMode = false;
             repaint();
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_P) {
             // Disables neighbour-deterministic cell colouring.
