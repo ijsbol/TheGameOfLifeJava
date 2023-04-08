@@ -24,13 +24,13 @@ import java.util.Dictionary;
 public class App extends JPanel implements KeyListener {
 
     // Game settings
-    private static final int CELL_SIZE_IN_PIXELS = 3;
+    private static final int CELL_SIZE_IN_PIXELS = 1;
     private static final Color DEAD_CELL_COLOUR = Color.BLACK;
     private static final Color ALIVE_CELL_COLOUR = Color.WHITE;
 
     // Window settings
-    private static final int WINDOW_WIDTH_IN_CELLS = 200;
-    private static final int WINDOW_HEIGHT_IN_CELLS = 200;
+    private static final int WINDOW_WIDTH_IN_CELLS = 500;
+    private static final int WINDOW_HEIGHT_IN_CELLS = 500;
 
     // Extra information
     private static final int MILLIESECONDS_BETWEEN_FRAMES = 10;
@@ -51,6 +51,20 @@ public class App extends JPanel implements KeyListener {
     private boolean randomUpdateState = false;
     private boolean initalCellMouseClickedAliveState;
     private boolean rainbowMode = false;
+    private boolean neighbourDeterministicCellColouringMode = false;
+
+    // neighbourDeterministicCellColouring variables.
+    private Color[] neighbourDeterministicCellColouringColours = new Color[]{
+        DEAD_CELL_COLOUR,           // 0 alive neighbours
+        new Color(255, 115, 58),    // 1 alive neighbour
+        new Color(255, 135, 56),    // 2 alive neighbours
+        new Color(255, 154, 56),    // 3 alive neighbours
+        new Color(255, 173, 60),    // 4 alive neighbours
+        new Color(255, 173, 60),    // 5 alive neighbours
+        new Color(255, 191, 67),    // 6 alive neighbours
+        new Color(255, 209, 78),    // 7 alive neighbours
+        new Color(255, 226, 92),    // 8 alive neighbours
+    };
 
     // Rainbow mode variables
     private Map<String, Integer> cornerOne = Map.of("r", 255,  "g", 0,  "b", 0);
@@ -161,6 +175,14 @@ public class App extends JPanel implements KeyListener {
         } else if(keyEvent.getKeyCode() == KeyEvent.VK_W) {
             // Disabled rainbow mode.
             this.rainbowMode = false;
+            repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_O) {
+            // Enables neighbour-deterministic cell colouring.
+            this.neighbourDeterministicCellColouringMode = true;
+            repaint();
+        } else if(keyEvent.getKeyCode() == KeyEvent.VK_P) {
+            // Disables neighbour-deterministic cell colouring.
+            this.neighbourDeterministicCellColouringMode = false;
             repaint();
         }
     }
@@ -340,13 +362,18 @@ public class App extends JPanel implements KeyListener {
             int x = this.updated_cell_locations.get(index);
             int y = this.updated_cell_locations.get(index + 1);
 
-            if (board[y][x]) {
+            if (board[y][x] && !neighbourDeterministicCellColouringMode) {
                 if (rainbowMode) {
                     Color color = convertXYToRGB(x, y);
                     graphicsContext.setColor(color);
-                } else {
+                }
+                else {
                     graphicsContext.setColor(ALIVE_CELL_COLOUR);
                 }
+            } else if (neighbourDeterministicCellColouringMode) {
+                int aliveNeighbours = getLiveSurroundingCells(x, y);
+                Color color = neighbourDeterministicCellColouringColours[aliveNeighbours];
+                graphicsContext.setColor(color);
             } else {
                 graphicsContext.setColor(DEAD_CELL_COLOUR);
             }

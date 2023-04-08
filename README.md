@@ -14,7 +14,9 @@
 |`S KEY`|Step through one generation.|
 |`Q KEY`|Enable rainbow mode.|
 |`W KEY`|Disable rainbow mode.|
- 
+|`O KEY`|Enable neighbour-deterministic cell colouring.|
+|`P KEY`|Enable neighbour-deterministic cell colouring.|
+
 ## Demo
 ![img](https://i.imgur.com/TXJWuP1.gif)
 
